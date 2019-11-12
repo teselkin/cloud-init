@@ -466,11 +466,12 @@ def wait_for_physdevs(netcfg, strict=True):
     physdevs = extract_physdevs(netcfg)
 
     # set of expected iface names and mac addrs
-    expected_ifaces = dict([(iface[0], iface[1]) for iface in physdevs])
+    expected_ifaces = dict([(iface[0].lower(), iface[1])
+                            for iface in physdevs])
     expected_macs = set(expected_ifaces.keys())
 
     # set of current macs
-    present_macs = get_interfaces_by_mac().keys()
+    present_macs = [mac.lower() for mac in get_interfaces_by_mac().keys()]
 
     # compare the set of expected mac address values to
     # the current macs present; we only check MAC as cloud-init
@@ -491,7 +492,7 @@ def wait_for_physdevs(netcfg, strict=True):
             util.log_time(LOG.debug, msg, func=settle)
 
         # update present_macs after settles
-        present_macs = get_interfaces_by_mac().keys()
+        present_macs = [mac.lower() for mac in get_interfaces_by_mac().keys()]
 
     msg = 'Not all expected physical devices present: %s' % missing
     LOG.warning(msg)
