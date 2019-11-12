@@ -178,6 +178,7 @@ def _clean_default(target=None):
 class Renderer(renderer.Renderer):
     """Renders network information in a /etc/netplan/network.yaml format."""
 
+    NETPLAN_APPLY = ['netplan', 'apply']
     NETPLAN_GENERATE = ['netplan', 'generate']
 
     def __init__(self, config=None):
@@ -209,12 +210,19 @@ class Renderer(renderer.Renderer):
             _clean_default(target=target)
         self._netplan_generate(run=self._postcmds)
         self._net_setup_link(run=self._postcmds)
+        self._netplan_apply(run=self._postcmds)
 
     def _netplan_generate(self, run=False):
         if not run:
             LOG.debug("netplan generate postcmd disabled")
             return
         util.subp(self.NETPLAN_GENERATE, capture=True)
+
+    def _netplan_apply(self, run=False):
+        if not run:
+            LOG.debug("netplan apply postcmd disabled")
+            return
+        util.subp(self.NETPLAN_APPLY, capture=True)
 
     def _net_setup_link(self, run=False):
         """To ensure device link properties are applied, we poke
