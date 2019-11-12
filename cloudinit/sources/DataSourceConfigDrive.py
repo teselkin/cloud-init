@@ -147,9 +147,13 @@ class DataSourceConfigDrive(openstack.SourceMixin, sources.DataSource):
     def network_config(self):
         if self._network_config is None:
             if self.network_json not in (None, sources.UNSET):
-                LOG.debug("network config provided via network_json")
-                self._network_config = openstack.convert_net_json(
-                    self.network_json, known_macs=self.known_macs)
+                LOG.debug("network config provided via network_json, "
+                          "version {}".format(self.version))
+                if self.version == 2:
+                    self._network_config = self.network_json
+                else:
+                    self._network_config = openstack.convert_net_json(
+                        self.network_json, known_macs=self.known_macs)
             elif self.network_eni is not None:
                 self._network_config = eni.convert_eni_data(self.network_eni)
                 LOG.debug("network config provided via converted eni data")
